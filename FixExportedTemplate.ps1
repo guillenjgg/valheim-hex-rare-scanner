@@ -1,0 +1,168 @@
+# PowerShell script to fix exported Visual Studio template
+# This script extracts your exported template, fixes the parameterization, and re-packages it
+
+param(
+    [string]$TemplatePath = "$env:USERPROFILE\Documents\Visual Studio 2022\My Exported Templates\ValheimModHarmonyTemplate.zip",
+    [string]$OutputPath = "$env:USERPROFILE\Documents\Visual Studio 2022\Templates\ProjectTemplates\ValheimModHarmonyTemplate.zip"
+)
+
+Write-Host "=== Valheim Mod Template Fixer ===" -ForegroundColor Cyan
+Write-Host ""
+
+# Check if template exists
+if (-not (Test-Path $TemplatePath)) {
+    Write-Host "Template not found at: $TemplatePath" -ForegroundColor Red
+    Write-Host "Please specify the correct path to your exported template." -ForegroundColor Yellow
+    Write-Host "Example: .\FixExportedTemplate.ps1 -TemplatePath 'C:\path\to\template.zip'" -ForegroundColor Yellow
+    exit 1
+}
+
+# Create temp directory
+$tempDir = Join-Path $env:TEMP "ValheimTemplateTemp_$(Get-Random)"
+New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+
+try {
+    Write-Host "Extracting template..." -ForegroundColor Yellow
+    Expand-Archive -Path $TemplatePath -DestinationPath $tempDir -Force
+
+    # Find and fix Plugin.cs
+    $pluginFile = Get-ChildItem -Path $tempDir -Filter "Plugin.cs" -Recurse | Select-Object -First 1
+    if ($pluginFile) {
+        Write-Host "Fixing Plugin.cs..." -ForegroundColor Green
+        $content = Get-Content $pluginFile.FullName -Raw
+
+        # Replace namespace
+        $content = $content -replace 'namespace ValheimModHarmonyTemplate', 'namespace $safeprojectname$'
+
+        # Replace plugin GUID
+        $content = $content -replace 'private const string PluginGuid = "com\.hex\.autopins";', 'private const string PluginGuid = "com.$username$.$safeprojectname$";'
+
+        # Replace plugin name
+        $content = $content -replace 'private const string PluginName = "HexAutoPins";', 'private const string PluginName = "$projectname$";'
+
+        Set-Content -Path $pluginFile.FullName -Value $content -NoNewline
+        Write-Host "  ? Plugin.cs updated" -ForegroundColor Green
+    }
+
+    # Find and fix PatchTemplate.cs
+    $patchFile = Get-ChildItem -Path $tempDir -Filter "PatchTemplate.cs" -Recurse | Select-Object -First 1
+    if ($patchFile) {
+        Write-Host "Fixing PatchTemplate.cs..." -ForegroundColor Green
+        $content = Get-Content $patchFile.FullName -Raw
+
+        # Replace namespace
+        $content = $content -replace 'namespace ValheimModHarmonyTemplate\.Patches', 'namespace $safeprojectname$.Patches'
+
+        Set-Content -Path $patchFile.FullName -Value $content -NoNewline
+        Write-Host "  ? PatchTemplate.cs updated" -ForegroundColor Green
+    }
+
+    # Find and fix AssemblyInfo.cs
+    $assemblyFile = Get-ChildItem -Path $tempDir -Filter "AssemblyInfo.cs" -Recurse | Select-Object -First 1
+    if ($assemblyFile) {
+        Write-Host "Fixing AssemblyInfo.cs..." -ForegroundColor Green
+        $content = Get-Content $assemblyFile.FullName -Raw
+
+        # Replace assembly attributes
+        $content = $content -replace '\[assembly: AssemblyTitle\("ValheimModHarmonyTemplate"\)\]', '[assembly: AssemblyTitle("$projectname$")]'
+        $content = $content -replace '\[assembly: AssemblyProduct\("ValheimModHarmonyTemplate"\)\]', '[assembly: AssemblyProduct("$projectname$")]'
+        $content = $content -replace '\[assembly: AssemblyCompany\(""\)\]', '[assembly: AssemblyCompany("$username$")]'
+        $content = $content -replace '\[assembly: AssemblyCopyright\("Copyright ©  2026"\)\]', '[assembly: AssemblyCopyright("Copyright © $username$ $year$")]'
+        $content = $content -replace '\[assembly: AssemblyDescription\(""\)\]', '[assembly: AssemblyDescription("Valheim mod built with BepInEx and Harmony")]'
+
+        Set-Content -Path $assemblyFile.FullName -Value $content -NoNewline
+        Write-Host "  ? AssemblyInfo.cs updated" -ForegroundColor Green
+    }
+
+    # Find and fix manifest.json
+    $manifestFile = Get-ChildItem -Path $tempDir -Filter "manifest.json" -Recurse | Select-Object -First 1
+    if ($manifestFile) {
+        Write-Host "Fixing manifest.json..." -ForegroundColor Green
+        $content = Get-Content $manifestFile.FullName -Raw
+
+        # Check if manifest is empty or needs updating
+        if ($content -match '"name":\s*"[^"]*"') {
+            $content = $content -replace '"name":\s*"[^"]*"', '"name": "$safeprojectname$"'
+            $content = $content -replace '"description":\s*"[^"]*"', '"description": "$projectname$ for Valheim"'
+            $content = $content -replace '"website_url":\s*"[^"]*"', '"website_url": "https://github.com/$username$/$safeprojectname$"'
+        }
+
+        Set-Content -Path $manifestFile.FullName -Value $content -NoNewline
+        Write-Host "  ? manifest.json updated" -ForegroundColor Green
+    }
+
+    # Find and fix README.md
+    $readmeFile = Get-ChildItem -Path $tempDir -Filter "README.md" -Recurse | Select-Object -First 1
+    if ($readmeFile) {
+        Write-Host "Fixing README.md..." -ForegroundColor Green
+        $content = Get-Content $readmeFile.FullName -Raw
+
+        # Replace project references
+        if ($content -match 'ValheimModHarmonyTemplate') {
+            $content = $content -replace 'ValheimModHarmonyTemplate', '$safeprojectname$'
+        }
+        # Add header if empty
+        if ([string]::IsNullOrWhiteSpace($content)) {
+            $content = "# `$projectname$`n`nA Valheim mod using BepInEx and Harmony."
+        }
+
+        Set-Content -Path $readmeFile.FullName -Value $content -NoNewline
+        Write-Host "  ? README.md updated" -ForegroundColor Green
+    }
+
+    # Update .vstemplate file to ensure ReplaceParameters is set
+    $vstemplateFile = Get-ChildItem -Path $tempDir -Filter "*.vstemplate" -Recurse | Select-Object -First 1
+    if ($vstemplateFile) {
+        Write-Host "Updating .vstemplate file..." -ForegroundColor Green
+        [xml]$vstemplate = Get-Content $vstemplateFile.FullName
+
+        # Ensure ReplaceParameters="true" on all ProjectItems
+        $projectItems = $vstemplate.SelectNodes("//ProjectItem")
+        foreach ($item in $projectItems) {
+            if ($null -eq $item.ReplaceParameters) {
+                $item.SetAttribute("ReplaceParameters", "true")
+            }
+        }
+
+        $vstemplate.Save($vstemplateFile.FullName)
+        Write-Host "  ? .vstemplate updated" -ForegroundColor Green
+    }
+
+    # Re-package the template
+    Write-Host ""
+    Write-Host "Re-packaging template..." -ForegroundColor Yellow
+
+    # Remove old output if exists
+    if (Test-Path $OutputPath) {
+        Remove-Item $OutputPath -Force
+    }
+
+    # Ensure output directory exists
+    $outputDir = Split-Path $OutputPath -Parent
+    if (-not (Test-Path $outputDir)) {
+        New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
+    }
+
+    # Create new zip
+    Compress-Archive -Path "$tempDir\*" -DestinationPath $OutputPath -Force
+
+    Write-Host ""
+    Write-Host "=== SUCCESS ===" -ForegroundColor Green
+    Write-Host "Fixed template saved to:" -ForegroundColor Green
+    Write-Host $OutputPath -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Yellow
+    Write-Host "1. Restart Visual Studio (or run: devenv /installvstemplates)" -ForegroundColor White
+    Write-Host "2. Create a new project and search for 'Valheim'" -ForegroundColor White
+    Write-Host "3. Test that the plugin GUID, name, and namespaces are correct" -ForegroundColor White
+
+} catch {
+    Write-Host ""
+    Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
+} finally {
+    # Cleanup
+    if (Test-Path $tempDir) {
+        Remove-Item $tempDir -Recurse -Force
+    }
+}
