@@ -1,5 +1,3 @@
-﻿# HexRareScanner
-
 Automatically adds minimap pins and plays a sound when selected rare creatures spawn. I hunt sea serpents and this mod helps track them.
 
 ## Features
@@ -72,6 +70,12 @@ BepInEx/plugins/
 
 3. Launch the game
 
+## Multiplayer
+
+This mod has only been tested in local single-player worlds.
+
+Multiplayer compatibility is currently unknown and has not been tested on dedicated servers or multiplayer sessions.
+
 ## Notes
 
 - Creature pins are temporary and do not persist between game sessions
@@ -81,9 +85,13 @@ BepInEx/plugins/
 - Each tracked creature receives its own unique map pin
 - Sound notifications can be disabled in the configuration
 
-## Requirements
+## Feedback
 
-- BepInEx 5.x
+Found a bug, have a suggestion, or want to request a creature to track?
+
+Report bugs or provide feedback on Discord:
+
+https://discord.gg/wU2FXD94v4
 
 ## Source Code
 
