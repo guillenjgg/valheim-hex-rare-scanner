@@ -12,13 +12,12 @@ internal static class PatchCharacterOnDeath
         }
 
         string prefabName = PrefabNameHelper.GetPrefabNameFromClone(__instance.gameObject.name);
+        int creatureLevel = Plugin.GetCreatureLevel(__instance);
 
-        if (!Plugin.IsTrackedPrefab(prefabName))
+        if (!Plugin.IsTrackedPrefab(prefabName, creatureLevel))
         {
             return;
         }
-
-        Plugin.Log.LogInfo($"Removing pin for {__instance.gameObject.name} at position {__instance.transform.position}");
 
         PinManager.RemoveCreaturePin(__instance);
     }

@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System.Collections;
 using UnityEngine;
 
 namespace HexRareScanner.Patches
@@ -8,37 +9,7 @@ namespace HexRareScanner.Patches
     {
         private static void Postfix(Character __instance)
         {
-            if (!Plugin.IsModEnabled || __instance == null)
-            {
-                return;
-            }
-
-            string prefabName = PrefabNameHelper.GetPrefabNameFromClone(__instance.gameObject.name);
-
-            if (!Plugin.IsTrackedPrefab(prefabName))
-            {
-                return;
-            }
-
-            if (PinManager.HasCreaturePin(__instance))
-            {
-                return;
-            }
-
-            string displayName = Plugin.GetDisplayName(prefabName);
-            Vector3 spawnPoint = __instance.transform.position;
-
-            Plugin.Log.LogInfo($"A {displayName} spawned at {spawnPoint}");
-
-            if (Plugin.PlayTrackedCreatureSound)
-            {
-                string soundEffectName = Plugin.GetSoundEffectName(prefabName);
-                PlayTrackedCreatureSound(soundEffectName, spawnPoint);
-            }
-
-            Player.m_localPlayer?.Message(MessageHud.MessageType.Center, $"A {displayName} is spawning!");
-
-            PinManager.AddCreaturePin(__instance, spawnPoint, displayName);
+            Plugin.Instance.StartCoroutine(DelayedScan(__instance));
         }
 
         private static void PlayTrackedCreatureSound(string soundEffectName, Vector3 position)
@@ -63,6 +34,51 @@ namespace HexRareScanner.Patches
             }
 
             Object.Instantiate(sfxPrefab, position, Quaternion.identity);
+        }
+
+
+        // We need to delay the scan, so m_level is initialized
+        private static IEnumerator DelayedScan(Character character)
+        {
+            yield return null;
+            yield return null;
+
+            if (!Plugin.IsModEnabled || character == null)
+            {
+                yield break;
+            }
+
+            string prefabName = PrefabNameHelper.GetPrefabNameFromClone(character.gameObject.name);
+            int creatureLevel = Plugin.GetCreatureLevel(character);
+
+            if (!Plugin.IsTrackedPrefab(prefabName, creatureLevel))
+            {
+                yield break;
+            }
+
+            if (PinManager.HasCreaturePin(character))
+            {
+                yield break;
+            }
+
+            string displayName = Plugin.GetDisplayName(prefabName);
+
+            if (creatureLevel > 1)
+            {
+                displayName = $"{creatureLevel - 1}-star {displayName}";
+            }
+
+            Vector3 spawnPoint = character.transform.position;
+
+            if (Plugin.PlayTrackedCreatureSound)
+            {
+                string soundEffectName = Plugin.GetSoundEffectName(prefabName);
+                PlayTrackedCreatureSound(soundEffectName, spawnPoint);
+            }
+
+            Player.m_localPlayer?.Message(MessageHud.MessageType.Center, $"A {displayName} spawned!");
+
+            PinManager.AddCreaturePin(character, spawnPoint, displayName);
         }
     }
 }

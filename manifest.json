@@ -1,9 +1,9 @@
 ﻿{
   "name": "HexRareScanner",
   "version_number": "1.0.0",
-  "website_url": "https://github.com/Jonathan/HexRareScanner",
-  "description": "HexRareScanner for Valheim",
+  "website_url": "https://discord.gg/wU2FXD94v4",
+  "description": "Automatically adds minimap pins and plays a sound when selected rare creatures spawn.",
   "dependencies": [
-    "denikson-BepInExPack_Valheim-5.4.2202"
+    "denikson-BepInExPack_Valheim-5.4.2333"
   ]
 }

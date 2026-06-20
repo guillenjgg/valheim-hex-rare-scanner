@@ -1,35 +1,92 @@
-﻿# $projectname$
+﻿# HexRareScanner
 
-A Valheim mod using BepInEx and Harmony.
+Automatically adds minimap pins and plays a sound when selected rare creatures spawn. I hunt sea serpents and this mod helps track them.
 
-## Development Setup
+## Features
 
-### Option 1: Environment Variable (Recommended)
-Set a system environment variable:
+- Automatically adds pins to the minimap and world map when tracked creatures spawn
+- Optional sound notification when a tracked creature is detected
+- Pins are automatically removed when the creature dies
+- Supports rare creature tracking (such as 2-star Wolves and 2-star Boars)
+- Configurable through BepInEx configuration settings
+
+## Tracked Creatures
+
+Current supported creatures include:
+
+- Sea Serpent
+- Bonemaw Serpent
+- Troll
+- Black Forest Bear
+- Vile Bear
+- Abomination
+- Stone Golem
+- Morgen
+- 2-star Wolf
+- 2-star Boar
+- 2-star Deer
+- 2-star Asksvin
+- Fallen Valkyrie
+
+## Configuration
+
+Configuration file:
+
+```text
+BepInEx/config/com.hex.rarescanner.cfg
 ```
-VALHEIM_INSTALL=C:\Program Files (x86)\Steam\steamapps\common\Valheim
+
+### General
+
+| Setting | Description |
+|----------|-------------|
+| IsModEnabled | Enable or disable the mod |
+| PlayTrackedCreatureSound | Play a sound when a tracked creature is detected |
+
+### Tracking
+
+Enable or disable tracking for individual creatures:
+
+- Track Sea Serpents
+- Track Bonemaw Serpents
+- Track Trolls
+- Track Black Forest Bears
+- Track Vile Bears
+- Track Abominations
+- Track Stone Golems
+- Track Morgens
+- Track 2-star Wolves
+- Track 2-star Boars
+- Track 2-star Deer
+- Track 2-star Asksvin
+- Track FallenValkyrie
+
+## Installation
+
+1. Install BepInEx
+2. Place `HexRareScanner.dll` into:
+
+```text
+BepInEx/plugins/
 ```
 
-### Option 2: User Project File
-Create `$safeprojectname$.csproj.user` with your Valheim installation path.
+3. Launch the game
 
-### Option 3: Auto-Detection
-The project will automatically search common Steam library locations.
+## Notes
 
-## Building
+- Creature pins are temporary and do not persist between game sessions
+- Pins are removed automatically when the tracked creature dies
+- Existing player-created map pins are never modified
+- Multiple tracked creatures can be active simultaneously
+- Each tracked creature receives its own unique map pin
+- Sound notifications can be disabled in the configuration
 
-- **Debug Build**: Automatically deploys to `BepInEx\plugins\$safeprojectname$`
-- **Release Build**: Creates package in `bin\Release`
+## Requirements
 
-## Plugin Information
+- BepInEx 5.x
 
-- **GUID**: `com.$username$.$safeprojectname$`
-- **Name**: `$projectname$`
-- **Version**: `1.0.0`
+## Source Code
 
-## Debugging
+GitHub Repository:
 
-1. Build in Debug configuration
-2. Launch Valheim
-3. Attach Visual Studio debugger to `valheim.exe`
-4. Set breakpoints in your patches
+https://github.com/guillenjgg/valheim-hex-rare-scanner

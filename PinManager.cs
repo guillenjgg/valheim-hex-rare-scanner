@@ -8,61 +8,62 @@ namespace HexRareScanner
     {
         private static readonly Dictionary<ZDOID, Minimap.PinData> PinsByZdoid = new Dictionary<ZDOID, Minimap.PinData>();
 
-        private static readonly FieldInfo CharacterNViewField =
-        typeof(Character).GetField(
-            "m_nview",
-            BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+        private static readonly FieldInfo CharacterNViewField = typeof(Character).GetField("m_nview", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 
-        private static readonly MethodInfo RemovePinMethod = typeof(Minimap).GetMethod(
-            "RemovePin",
-            BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public,
-            null,
-            new[] { typeof(Minimap.PinData) },
-            null
-        );
+        private static readonly MethodInfo RemovePinMethod = typeof(Minimap).GetMethod("RemovePin", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public, null, new[] { typeof(Minimap.PinData) }, null);
 
         internal static void AddCreaturePin(Character character, Vector3 position, string pinName)
         {
-            var zdoid = GetZdoId(character);
-
-            if(zdoid == ZDOID.None)
-            {
-                Plugin.Log.LogWarning($"Could not get ZDOID for character {character.gameObject.name}. Pin will not be added.");
-                return;
-            }
-
-            Minimap.PinData pin = Minimap.instance?.AddPin(
-                position,
-                Minimap.PinType.Ping,
-                pinName,
-                true,
-                false);
-
-            if(pin == null)
+            if (Minimap.instance == null)
             {
                 return;
             }
 
-            PinsByZdoid[zdoid] = pin;
-            Plugin.Log.LogInfo($"Added pin for {character.gameObject.name}. ZDOID: {zdoid}");
-        }
-
-        internal static void RemoveCreaturePin(Character character)
-        {
             ZDOID zdoid = GetZdoId(character);
             string characterName = character != null ? character.gameObject.name : "null";
 
             if (zdoid == ZDOID.None)
             {
-                Plugin.Log.LogWarning($"Could not get ZDOID for character {character.gameObject.name}. Pin will not be removed.");
+                Plugin.Log.LogWarning($"Could not get ZDOID for character {characterName}. Pin will not be added.");
                 return;
             }
 
-            if(PinsByZdoid.TryGetValue(zdoid, out Minimap.PinData pin))
+            if (PinsByZdoid.ContainsKey(zdoid))
+            {
+                return;
+            }
+
+            Minimap.PinData pin = Minimap.instance.AddPin(position, Minimap.PinType.Ping, pinName, false, false);
+
+            if (pin == null)
+            {
+                return;
+            }
+
+            PinsByZdoid[zdoid] = pin;
+        }
+
+        internal static void RemoveCreaturePin(Character character)
+        {
+            if (Minimap.instance == null)
+            {
+                return;
+            }
+
+            ZDOID zdoid = GetZdoId(character);
+            string characterName = character != null ? character.gameObject.name : "null";
+
+            if (zdoid == ZDOID.None)
+            {
+                Plugin.Log.LogWarning($"Could not get ZDOID for character {characterName}. Pin will not be removed.");
+                return;
+            }
+
+            if (PinsByZdoid.TryGetValue(zdoid, out Minimap.PinData pin))
             {
                 RemovePinMethod?.Invoke(Minimap.instance, new object[] { pin });
                 PinsByZdoid.Remove(zdoid);
-                Plugin.Log.LogInfo($"Removed pin for {characterName}. ZDOID: {zdoid}");
+                
                 return;
             }
 
@@ -76,7 +77,7 @@ namespace HexRareScanner
                 return ZDOID.None;
             }
 
-            var nview = CharacterNViewField.GetValue(character) as ZNetView;
+            ZNetView nview = CharacterNViewField.GetValue(character) as ZNetView;
 
             if (nview == null || nview.GetZDO() == null)
             {
@@ -96,6 +97,11 @@ namespace HexRareScanner
             }
 
             return PinsByZdoid.ContainsKey(zdoid);
+        }
+
+        internal static void Clear()
+        {
+            PinsByZdoid.Clear();
         }
     }
 }
