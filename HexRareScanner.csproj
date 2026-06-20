@@ -20,7 +20,6 @@
     <OutputPath>..\..\..\..\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\Dev\BepInEx\plugins\HexRareScanner\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,7 +27,6 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -66,9 +64,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Patches\PatchCharacterOnDeath.cs" />
-    <Compile Include="Patches\PatchSpawnSystemSpawn.cs" />
+    <Compile Include="Patches\PatchCharacterAwake.cs" />
     <Compile Include="PinManager.cs" />
     <Compile Include="Plugin.cs" />
+    <Compile Include="PrefabNameHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

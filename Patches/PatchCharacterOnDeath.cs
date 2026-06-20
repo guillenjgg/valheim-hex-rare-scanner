@@ -6,7 +6,14 @@ internal static class PatchCharacterOnDeath
 {
     internal static void Prefix(Character __instance)
     {
-        if(!Plugin.IsModEnabled || __instance == null || !__instance.gameObject.name.Contains("Serpent"))
+        if (!Plugin.IsModEnabled || __instance == null)
+        {
+            return;
+        }
+
+        string prefabName = PrefabNameHelper.GetPrefabNameFromClone(__instance.gameObject.name);
+
+        if (!Plugin.IsTrackedPrefab(prefabName))
         {
             return;
         }
