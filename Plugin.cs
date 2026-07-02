@@ -12,7 +12,7 @@ namespace HexRareScanner
     {
         private const string PluginGuid = "com.hex.rarescanner";
         private const string PluginName = "HexRareScanner";
-        private const string PluginVersion = "1.0.0";
+        private const string PluginVersion = "1.0.1";
         
         private Harmony _harmonyInstance;
 
@@ -38,8 +38,9 @@ namespace HexRareScanner
 
             InitializeConfig();
 
+            Assembly assembly = Assembly.GetExecutingAssembly();
             _harmonyInstance = new Harmony(PluginGuid);
-            _harmonyInstance.PatchAll();
+            _harmonyInstance.PatchAll(assembly);
 
             Log.LogInfo($"{PluginName} v{PluginVersion} loaded.");
         }
@@ -73,7 +74,7 @@ namespace HexRareScanner
             AddTrackedCreature("Boar", "Track 2-star Boars", "Boar", "sfx_boar_idle", 3);
             AddTrackedCreature("Deer", "Track 2-star Deer", "Deer", "sfx_deer_idle", 3);
             AddTrackedCreature("Asksvin", "Track 2-star Asksvin", "Asksvin", "sfx_asksvin_idle", 3);
-            AddTrackedCreature("FallenValkyrie", "Track Fallen Valkyrie", "FallenValkyrie", "sfx_valkyrie_flapwing");
+            AddTrackedCreature("FallenValkyrie", "Track Fallen Valkyrie", "FallenValkyrie", "sfx_fallenvalkyrie_alert");
         }
 
         private void AddTrackedCreature(string prefabName, string configName, string displayName, string soundEffectName, int rarityLevel = 1)
