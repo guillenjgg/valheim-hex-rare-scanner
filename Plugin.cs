@@ -12,7 +12,7 @@ namespace HexRareScanner
     {
         private const string PluginGuid = "com.hex.rarescanner";
         private const string PluginName = "HexRareScanner";
-        private const string PluginVersion = "1.0.1";
+        private const string PluginVersion = "1.0.2";
         
         private Harmony _harmonyInstance;
 
