@@ -12,8 +12,8 @@ namespace HexRareScanner
     {
         private const string PluginGuid = "com.hex.rarescanner";
         private const string PluginName = "HexRareScanner";
-        private const string PluginVersion = "1.0.2";
-        
+        private const string PluginVersion = "1.2.0";
+
         private Harmony _harmonyInstance;
 
         private static ConfigEntry<bool> _isModEnabled;
@@ -21,9 +21,9 @@ namespace HexRareScanner
         private static readonly Dictionary<string, TrackedCreatureSetting> TrackedCreatures = new Dictionary<string, TrackedCreatureSetting>();
 
         internal static readonly FieldInfo CharacterMLevelField =
-        typeof(Character).GetField(
-            "m_level",
-            BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+            typeof(Character).GetField(
+                "m_level",
+                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 
         internal static bool IsModEnabled => _isModEnabled?.Value ?? false;
         internal static bool PlayTrackedCreatureSound => _playTrackedCreatureSound?.Value ?? false;
@@ -75,6 +75,11 @@ namespace HexRareScanner
             AddTrackedCreature("Deer", "Track 2-star Deer", "Deer", "sfx_deer_idle", 3);
             AddTrackedCreature("Asksvin", "Track 2-star Asksvin", "Asksvin", "sfx_asksvin_idle", 3);
             AddTrackedCreature("FallenValkyrie", "Track Fallen Valkyrie", "FallenValkyrie", "sfx_fallenvalkyrie_alert");
+            AddTrackedCreature("Writhan", "Track Writhan", "Writhan", "sfx_writhan_verse_attack");
+            AddTrackedCreature("Barka", "Track Barkas", "Barka", null);
+            AddTrackedCreature("ShadowPerson", "Track Shadow Persons", "Shadow Person", null);
+            AddTrackedCreature("Skeleton_DeepNorth", "Track Deep North Skeletons", "Deep North Skeleton", null);
+            AddTrackedCreature("Greydwarf_Frozen", "Track 2-star Frozen Greydwarfs", "Frozen Greydwarf", null, 3);
         }
 
         private void AddTrackedCreature(string prefabName, string configName, string displayName, string soundEffectName, int rarityLevel = 1)

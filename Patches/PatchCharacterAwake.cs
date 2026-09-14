@@ -36,7 +36,6 @@ namespace HexRareScanner.Patches
             Object.Instantiate(sfxPrefab, position, Quaternion.identity);
         }
 
-
         // We need to delay the scan, so m_level is initialized
         private static IEnumerator DelayedScan(Character character)
         {
@@ -48,10 +47,16 @@ namespace HexRareScanner.Patches
                 yield break;
             }
 
-            string prefabName = PrefabNameHelper.GetPrefabNameFromClone(character.gameObject.name);
-            int creatureLevel = Plugin.GetCreatureLevel(character);
+            string prefabName =
+                PrefabNameHelper.GetPrefabNameFromClone(
+                    character.gameObject.name);
 
-            if (!Plugin.IsTrackedPrefab(prefabName, creatureLevel))
+            int creatureLevel =
+                Plugin.GetCreatureLevel(character);
+
+            if (!Plugin.IsTrackedPrefab(
+                prefabName,
+                creatureLevel))
             {
                 yield break;
             }
@@ -61,24 +66,36 @@ namespace HexRareScanner.Patches
                 yield break;
             }
 
-            string displayName = Plugin.GetDisplayName(prefabName);
+            string displayName =
+                Plugin.GetDisplayName(prefabName);
 
             if (creatureLevel > 1)
             {
-                displayName = $"{creatureLevel - 1}-star {displayName}";
+                displayName =
+                    $"{creatureLevel - 1}-star {displayName}";
             }
 
-            Vector3 spawnPoint = character.transform.position;
+            Vector3 spawnPoint =
+                character.transform.position;
 
             if (Plugin.PlayTrackedCreatureSound)
             {
-                string soundEffectName = Plugin.GetSoundEffectName(prefabName);
-                PlayTrackedCreatureSound(soundEffectName, spawnPoint);
+                string soundEffectName =
+                    Plugin.GetSoundEffectName(prefabName);
+
+                PlayTrackedCreatureSound(
+                    soundEffectName,
+                    spawnPoint);
             }
 
-            Player.m_localPlayer?.Message(MessageHud.MessageType.Center, $"A {displayName} spawned!");
+            Player.m_localPlayer?.Message(
+                MessageHud.MessageType.Center,
+                $"A {displayName} spawned!");
 
-            PinManager.AddCreaturePin(character, spawnPoint, displayName);
+            PinManager.AddCreaturePin(
+                character,
+                spawnPoint,
+                displayName);
         }
     }
 }
