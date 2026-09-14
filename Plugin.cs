@@ -12,7 +12,7 @@ namespace HexRareScanner
     {
         private const string PluginGuid = "com.hex.rarescanner";
         private const string PluginName = "HexRareScanner";
-        private const string PluginVersion = "1.2.0";
+        private const string PluginVersion = "1.3.0";
 
         private Harmony _harmonyInstance;
 
@@ -76,10 +76,15 @@ namespace HexRareScanner
             AddTrackedCreature("Asksvin", "Track 2-star Asksvin", "Asksvin", "sfx_asksvin_idle", 3);
             AddTrackedCreature("FallenValkyrie", "Track Fallen Valkyrie", "FallenValkyrie", "sfx_fallenvalkyrie_alert");
             AddTrackedCreature("Writhan", "Track Writhan", "Writhan", "sfx_writhan_verse_attack");
-            AddTrackedCreature("Barka", "Track Barkas", "Barka", null);
+            AddTrackedCreature("Barka", "Track Barkas", "Barka", "Enemy_Barka_Footstep");
             AddTrackedCreature("ShadowPerson", "Track Shadow Persons", "Shadow Person", null);
             AddTrackedCreature("Skeleton_DeepNorth", "Track Deep North Skeletons", "Deep North Skeleton", null);
-            AddTrackedCreature("Greydwarf_Frozen", "Track 2-star Frozen Greydwarfs", "Frozen Greydwarf", null, 3);
+            AddTrackedCreature("Greydwarf_Frozen", "Track 2-star Frozen Greydwarfs", "Frozen Greydwarf", null);
+            AddTrackedCreature("TrollFrost", "Track Frost Trolls", "Frost Troll", "sfx_gameltroll_melee_attack");
+            AddTrackedCreature("Moose", "Track Moose", "Moose", "sfx_moose_alert");
+            AddTrackedCreature("FallenWarrior", "Track Fallen Warriors", "Fallen Warrior", "sfx_fallenwarrior_attack");
+            AddTrackedCreature("ElakingMole", "Track Eyeless One", "Eyeless One", "ElakingMole_AttackClaw");
+            AddTrackedCreature("Elaking", "Track Elaking", "Elaking", "ElakingMole_AttackClaw");
         }
 
         private void AddTrackedCreature(string prefabName, string configName, string displayName, string soundEffectName, int rarityLevel = 1)

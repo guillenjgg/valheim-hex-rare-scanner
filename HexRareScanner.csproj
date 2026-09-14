@@ -17,7 +17,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\Dev\BepInEx\plugins\HexRareScanner\</OutputPath>
+    <OutputPath>..\..\..\..\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\Valheim1.0Release\BepInEx\plugins\Hex_Viking-HexRareScanner\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
