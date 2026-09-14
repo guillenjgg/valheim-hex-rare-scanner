@@ -15,7 +15,7 @@ namespace HexRareScanner.Patches
 
         private static bool Prefix(Minimap __instance)
         {
-            if (!Plugin.IsModEnabled || __instance == null)
+            if (!Plugin.IsModEnabled || !Plugin.IsManualPinRemovalEnabled || __instance == null)
             {
                 return true;
             }

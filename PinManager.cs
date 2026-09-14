@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace HexRareScanner
 {
@@ -14,13 +15,13 @@ namespace HexRareScanner
 
         internal static void AddCreaturePin(Character character, Vector3 position, string pinName)
         {
-            if (Minimap.instance == null)
+            if (Minimap.instance == null || character == null)
             {
                 return;
             }
 
             ZDOID zdoid = GetZdoId(character);
-            string characterName = character != null ? character.gameObject.name : "null";
+            string characterName = character.gameObject.name;
 
             if (zdoid == ZDOID.None)
             {
@@ -38,6 +39,19 @@ namespace HexRareScanner
             if (pin == null)
             {
                 return;
+            }
+
+            string prefabName = PrefabNameHelper.GetPrefabNameFromClone(character.gameObject.name);
+            TrackedCreatureDefinition definition = GetCreatureDefinition(prefabName);
+
+            if (definition != null)
+            {
+                Sprite creatureIcon = GetCreatureIcon(definition.TrophyPrefabName);
+
+                if (creatureIcon != null)
+                {
+                    SetPinIcon(pin, creatureIcon);
+                }
             }
 
             PinsByZdoid[zdoid] = pin;
@@ -162,6 +176,60 @@ namespace HexRareScanner
         internal static void Clear()
         {
             PinsByZdoid.Clear();
+        }
+
+        private static TrackedCreatureDefinition GetCreatureDefinition(string prefabName)
+        {
+            foreach (TrackedCreatureDefinition creature in TrackedCreatureDefinition.Creatures)
+            {
+                if (creature.PrefabName == prefabName)
+                {
+                    return creature;
+                }
+            }
+
+            return null;
+        }
+
+        private static Sprite GetCreatureIcon(string trophyPrefabName)
+        {
+            if (string.IsNullOrEmpty(trophyPrefabName) || ObjectDB.instance == null)
+            {
+                return null;
+            }
+
+            GameObject trophyPrefab = ObjectDB.instance.GetItemPrefab(trophyPrefabName);
+
+            if (trophyPrefab == null)
+            {
+                Plugin.Log.LogDebug($"Could not find trophy prefab {trophyPrefabName}.");
+                return null;
+            }
+
+            ItemDrop itemDrop = trophyPrefab.GetComponent<ItemDrop>();
+
+            if (itemDrop == null)
+            {
+                Plugin.Log.LogDebug($"Trophy prefab {trophyPrefabName} does not contain an ItemDrop component.");
+                return null;
+            }
+
+            return itemDrop.m_itemData.GetIcon();
+        }
+
+        private static void SetPinIcon(Minimap.PinData pin, Sprite icon)
+        {
+            if (pin == null || icon == null)
+            {
+                return;
+            }
+
+            pin.m_icon = icon;
+
+            if (pin.m_iconElement != null)
+            {
+                pin.m_iconElement.sprite = icon;
+            }
         }
     }
 }

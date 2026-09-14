@@ -46,8 +46,8 @@
       <HintPath>..\..\bepinex_mod_libs\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Splatform">
-      <HintPath>..\..\valheim_mod_libraries\Splatform.dll</HintPath>
+    <Reference Include="Splatform_publicized">
+      <HintPath>..\..\publicized_assemblies\1.0-release\Splatform_publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -66,6 +66,10 @@
       <HintPath>..\..\valheim_mod_libraries\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\valheim_mod_libraries\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Patches\PatchCharacterOnDeath.cs" />
@@ -75,6 +79,7 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="PrefabNameHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TrackedCreatureDefinition.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CHANGELOG.md">
