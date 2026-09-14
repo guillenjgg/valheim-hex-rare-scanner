@@ -1,38 +1,73 @@
 # HexRareScanner
 
-Automatically adds minimap pins and plays a sound when selected rare creatures spawn. I hunt sea serpents and this mod helps track them.
+Automatically adds minimap pins and plays a sound when selected rare creatures spawn. I hunt sea serpents, and this mod helps track them.
 
 ## Features
 
-* Automatically adds pins to the minimap and world map when tracked creatures spawn
-* Optional sound notification when a tracked creature is detected
-* Pins are automatically removed when the creature dies
-* Supports rare creature tracking, including selected Deep North creatures
-* Supports star-level filtering for creatures such as 2-star Wolves, Boars, Deer, Asksvin, and Frozen Greydwarfs
-* Configurable through BepInEx configuration settings
+* Automatically adds pins to the minimap when tracked creatures spawn.
+* Optional sound notification when a tracked creature is detected.
+* Pins are automatically removed when the creature dies.
+* Tracked creature pins can be manually removed by right-clicking them on the map.
+* Independently configure which creatures are tracked.
+* Tracked creature settings are organized by biome.
 
 ## Tracked Creatures
 
 Current supported creatures include:
 
+### Ocean
+
 * Sea Serpent
 * Bonemaw Serpent
+
+### Meadows
+
+* 2-star Deer
+* White Deer
+* 2-star Boar
+
+### Black Forest
+
 * Troll
 * Black Forest Bear
-* Vile Bear
+
+### Swamp
+
 * Abomination
+* Writhan
+
+### Mountains
+
 * Stone Golem
-* Morgen
 * 2-star Wolf
-* 2-star Boar
-* 2-star Deer
+
+### Plains
+
+* Vile Bear
+
+### Mistlands
+
+* Seeker Soldier
+* 1-star or higher Seeker
+* Gjall
+
+### Ashlands
+
 * 2-star Asksvin
 * Fallen Valkyrie
-* Writhan
+* Morgen
+
+### Deep North
+
 * Barka
 * Shadow Person
 * Deep North Skeleton
 * 2-star Frozen Greydwarf
+* Gammeltroll
+* Moose
+* Fallen Warrior
+* Eyeless One
+* Elaking
 
 ## Writhan
 
@@ -57,9 +92,11 @@ Spawn requirements include:
 
 Configuration file:
 
-```text
-BepInEx/config/com.hex.rarescanner.cfg
-```
+`BepInEx/config/com.hex.rarescanner.cfg`
+
+Tracked creatures can be enabled or disabled individually through the BepInEx configuration settings.
+
+Manual map pin removal and tracked creature sounds can also be enabled or disabled through configuration.
 
 ## Links
 

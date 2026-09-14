@@ -12,21 +12,21 @@ namespace HexRareScanner
     {
         private const string PluginGuid = "com.hex.rarescanner";
         private const string PluginName = "HexRareScanner";
-        private const string PluginVersion = "1.2.0";
+        private const string PluginVersion = "1.3.0";
 
         private Harmony _harmonyInstance;
 
         private static ConfigEntry<bool> _isModEnabled;
         private static ConfigEntry<bool> _playTrackedCreatureSound;
+        private static ConfigEntry<bool> _isManualPinRemovalEnabled;
+
         private static readonly Dictionary<string, TrackedCreatureSetting> TrackedCreatures = new Dictionary<string, TrackedCreatureSetting>();
 
-        internal static readonly FieldInfo CharacterMLevelField =
-            typeof(Character).GetField(
-                "m_level",
-                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+        internal static readonly FieldInfo CharacterMLevelField = AccessTools.Field(typeof(Character), "m_level");
 
         internal static bool IsModEnabled => _isModEnabled?.Value ?? false;
         internal static bool PlayTrackedCreatureSound => _playTrackedCreatureSound?.Value ?? false;
+        internal static bool IsManualPinRemovalEnabled => _isManualPinRemovalEnabled?.Value ?? true;
 
         internal static Plugin Instance;
         internal static ManualLogSource Log;
@@ -47,7 +47,7 @@ namespace HexRareScanner
 
         private void OnDestroy()
         {
-            Log.LogInfo($"{PluginName} v{PluginVersion} unloaded.");
+            Log?.LogInfo($"{PluginName} v{PluginVersion} unloaded.");
 
             _harmonyInstance?.UnpatchSelf();
             _harmonyInstance = null;
@@ -60,32 +60,19 @@ namespace HexRareScanner
             TrackedCreatures.Clear();
 
             _isModEnabled = Config.Bind("General", "IsModEnabled", true, "Enable or disable the mod.");
-            _playTrackedCreatureSound = Config.Bind("General", "PlayTrackedCreatureSound", true, "Enable or disable the tracked creature spawn sound.");
+            _playTrackedCreatureSound = Config.Bind("Sounds", "PlayTrackedCreatureSound", true, "Enable or disable the tracked creature spawn sound.");
+            _isManualPinRemovalEnabled = Config.Bind("Map Pins", "Enable Manual Pin Removal", true, "Allow tracked creature pins to be removed by right-clicking them on the map.");
 
-            AddTrackedCreature("Serpent", "Track Sea Serpents", "Sea Serpent", "sfx_serpent_taunt");
-            AddTrackedCreature("BonemawSerpent", "Track Bonemaw Serpents", "Bonemaw Serpent", "sfx_bonemaw_serpent_alert");
-            AddTrackedCreature("Troll", "Track Trolls", "Troll", "sfx_troll_idle");
-            AddTrackedCreature("Bjorn", "Track Black Forest Bears", "Black Forest Bear", "sfx_bear_bite_attack");
-            AddTrackedCreature("Unbjorn", "Track Vile Bears", "Vile Bear", "sfx_bear_bite_attack");
-            AddTrackedCreature("Abomination", "Track Abominations", "Abomination", "sfx_abomination_arise_end");
-            AddTrackedCreature("StoneGolem", "Track Stone Golems", "Stone Golem", "sfx_stonegolem_idle");
-            AddTrackedCreature("Morgen", "Track Morgens", "Morgen", "sfx_morgen_idle");
-            AddTrackedCreature("Wolf", "Track 2-star Wolves", "Wolf", "sfx_wolf_alerted", 3);
-            AddTrackedCreature("Boar", "Track 2-star Boars", "Boar", "sfx_boar_idle", 3);
-            AddTrackedCreature("Deer", "Track 2-star Deer", "Deer", "sfx_deer_idle", 3);
-            AddTrackedCreature("Asksvin", "Track 2-star Asksvin", "Asksvin", "sfx_asksvin_idle", 3);
-            AddTrackedCreature("FallenValkyrie", "Track Fallen Valkyrie", "FallenValkyrie", "sfx_fallenvalkyrie_alert");
-            AddTrackedCreature("Writhan", "Track Writhan", "Writhan", "sfx_writhan_verse_attack");
-            AddTrackedCreature("Barka", "Track Barkas", "Barka", null);
-            AddTrackedCreature("ShadowPerson", "Track Shadow Persons", "Shadow Person", null);
-            AddTrackedCreature("Skeleton_DeepNorth", "Track Deep North Skeletons", "Deep North Skeleton", null);
-            AddTrackedCreature("Greydwarf_Frozen", "Track 2-star Frozen Greydwarfs", "Frozen Greydwarf", null, 3);
+            foreach (var creature in TrackedCreatureDefinition.Creatures)
+            {
+                AddTrackedCreature(creature.ConfigSection, creature.PrefabName, creature.ConfigName, creature.DisplayName, creature.SoundEffectName, creature.MinimumLevel);
+            }
         }
 
-        private void AddTrackedCreature(string prefabName, string configName, string displayName, string soundEffectName, int rarityLevel = 1)
+        private void AddTrackedCreature(string configSection, string prefabName, string configName, string displayName, string soundEffectName, int rarityLevel = 1)
         {
             TrackedCreatures[prefabName] = new TrackedCreatureSetting(
-                Config.Bind("Tracking", configName, true, $"Enable or disable tracking of {displayName}."),
+                Config.Bind(configSection, configName, true, $"Enable or disable tracking of {displayName}."),
                 displayName,
                 soundEffectName,
                 rarityLevel);
