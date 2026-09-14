@@ -1,10 +1,28 @@
-## 1.0.2
+## Changelog
+
+## v1.2.0
 
 ### Added
-- Valheim 1.0 update
+
+* Added support for Valheim's Deep North update.
+* Added tracking for Writhan (good luck.)
+* Added tracking for Barka.
+* Added tracking for Shadow Person.
+* Added tracking for Deep North Skeletons.
+* Added tracking for 2-star Frozen Greydwarfs.
+
+## v1.0.2
+
+### Added
+
+* Valheim 1.0 update.
 
 ## v1.0.1
-- Fixed missing spawn sound effect for Fallen Valkyries.
+
+### Fixed
+
+* Fixed missing spawn sound effect for Fallen Valkyries.
 
 ## v1.0.0
-- Initial release
+
+* Initial release.
