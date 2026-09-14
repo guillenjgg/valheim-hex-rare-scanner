@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using HarmonyLib;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
@@ -8,9 +9,8 @@ namespace HexRareScanner
     {
         private static readonly Dictionary<ZDOID, Minimap.PinData> PinsByZdoid = new Dictionary<ZDOID, Minimap.PinData>();
 
-        private static readonly FieldInfo CharacterNViewField = typeof(Character).GetField("m_nview", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-
-        private static readonly MethodInfo RemovePinMethod = typeof(Minimap).GetMethod("RemovePin", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public, null, new[] { typeof(Minimap.PinData) }, null);
+        private static readonly FieldInfo CharacterNViewField = AccessTools.Field(typeof(Character), "m_nview");
+        private static readonly MethodInfo RemovePinMethod = AccessTools.Method(typeof(Minimap), "RemovePin", new[] { typeof(Minimap.PinData) });
 
         internal static void AddCreaturePin(Character character, Vector3 position, string pinName)
         {
@@ -24,7 +24,7 @@ namespace HexRareScanner
 
             if (zdoid == ZDOID.None)
             {
-                Plugin.Log.LogWarning($"Could not get ZDOID for character {characterName}. Pin will not be added.");
+                Plugin.Log.LogDebug($"Could not get ZDOID for character {characterName}. Pin will not be added.");
                 return;
             }
 
@@ -55,7 +55,7 @@ namespace HexRareScanner
 
             if (zdoid == ZDOID.None)
             {
-                Plugin.Log.LogWarning($"Could not get ZDOID for character {characterName}. Pin will not be removed.");
+                Plugin.Log.LogDebug($"Could not get ZDOID for character {characterName}. Pin will not be removed.");
                 return;
             }
 
@@ -63,11 +63,71 @@ namespace HexRareScanner
             {
                 RemovePinMethod?.Invoke(Minimap.instance, new object[] { pin });
                 PinsByZdoid.Remove(zdoid);
-                
+
                 return;
             }
 
-            Plugin.Log.LogWarning($"No pin found for {characterName}. ZDOID: {zdoid}");
+            Plugin.Log.LogDebug($"No pin found for {characterName}. ZDOID: {zdoid}");
+        }
+
+        internal static Minimap.PinData GetClosestCreaturePin(Vector3 position, float radius)
+        {
+            Minimap.PinData closestPin = null;
+            float closestDistance = float.MaxValue;
+
+            foreach (Minimap.PinData pin in PinsByZdoid.Values)
+            {
+                if (pin == null)
+                {
+                    continue;
+                }
+
+                if (pin.m_uiElement == null || !pin.m_uiElement.gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                float distance = Utils.DistanceXZ(position, pin.m_pos);
+
+                if (distance >= radius || distance >= closestDistance)
+                {
+                    continue;
+                }
+
+                closestPin = pin;
+                closestDistance = distance;
+            }
+
+            return closestPin;
+        }
+
+        internal static bool RemoveCreaturePin(Minimap.PinData pin)
+        {
+            if (pin == null || Minimap.instance == null)
+            {
+                return false;
+            }
+
+            ZDOID zdoidToRemove = ZDOID.None;
+
+            foreach (KeyValuePair<ZDOID, Minimap.PinData> entry in PinsByZdoid)
+            {
+                if (entry.Value == pin)
+                {
+                    zdoidToRemove = entry.Key;
+                    break;
+                }
+            }
+
+            if (zdoidToRemove == ZDOID.None)
+            {
+                return false;
+            }
+
+            RemovePinMethod?.Invoke(Minimap.instance, new object[] { pin });
+            PinsByZdoid.Remove(zdoidToRemove);
+
+            return true;
         }
 
         internal static ZDOID GetZdoId(Character character)

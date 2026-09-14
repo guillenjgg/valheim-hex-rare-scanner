@@ -33,6 +33,10 @@
       <HintPath>..\..\bepinex_mod_libs\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="assembly_utils_publicized">
+      <HintPath>..\..\publicized_assemblies\1.0-release\assembly_utils_publicized.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="assembly_valheim_publicized, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\publicized_assemblies\1.0-release\assembly_valheim_publicized.dll</HintPath>
@@ -66,6 +70,7 @@
   <ItemGroup>
     <Compile Include="Patches\PatchCharacterOnDeath.cs" />
     <Compile Include="Patches\PatchCharacterAwake.cs" />
+    <Compile Include="Patches\PatchMinimapRemovePinUnderPointer.cs" />
     <Compile Include="PinManager.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="PrefabNameHelper.cs" />
