@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace HexRareScanner
 {
@@ -21,11 +20,9 @@ namespace HexRareScanner
             }
 
             ZDOID zdoid = GetZdoId(character);
-            string characterName = character.gameObject.name;
 
             if (zdoid == ZDOID.None)
             {
-                Plugin.Log.LogDebug($"Could not get ZDOID for character {characterName}. Pin will not be added.");
                 return;
             }
 
@@ -65,23 +62,19 @@ namespace HexRareScanner
             }
 
             ZDOID zdoid = GetZdoId(character);
-            string characterName = character != null ? character.gameObject.name : "null";
 
             if (zdoid == ZDOID.None)
             {
-                Plugin.Log.LogDebug($"Could not get ZDOID for character {characterName}. Pin will not be removed.");
                 return;
             }
 
-            if (PinsByZdoid.TryGetValue(zdoid, out Minimap.PinData pin))
+            if (!PinsByZdoid.TryGetValue(zdoid, out Minimap.PinData pin))
             {
-                RemovePinMethod?.Invoke(Minimap.instance, new object[] { pin });
-                PinsByZdoid.Remove(zdoid);
-
                 return;
             }
 
-            Plugin.Log.LogDebug($"No pin found for {characterName}. ZDOID: {zdoid}");
+            RemovePinMethod?.Invoke(Minimap.instance, new object[] { pin });
+            PinsByZdoid.Remove(zdoid);
         }
 
         internal static Minimap.PinData GetClosestCreaturePin(Vector3 position, float radius)
@@ -202,15 +195,13 @@ namespace HexRareScanner
 
             if (trophyPrefab == null)
             {
-                Plugin.Log.LogDebug($"Could not find trophy prefab {trophyPrefabName}.");
                 return null;
             }
 
             ItemDrop itemDrop = trophyPrefab.GetComponent<ItemDrop>();
 
-            if (itemDrop == null)
+            if (itemDrop == null || itemDrop.m_itemData == null)
             {
-                Plugin.Log.LogDebug($"Trophy prefab {trophyPrefabName} does not contain an ItemDrop component.");
                 return null;
             }
 
