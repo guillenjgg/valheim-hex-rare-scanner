@@ -23,8 +23,6 @@ namespace HexRareScanner
 
         private static readonly Dictionary<string, TrackedCreatureSetting> TrackedCreatures = new Dictionary<string, TrackedCreatureSetting>();
 
-        internal static readonly FieldInfo CharacterMLevelField = AccessTools.Field(typeof(Character), "m_level");
-
         internal static bool IsModEnabled => _isModEnabled?.Value ?? false;
         internal static bool PlayTrackedCreatureSound => _playTrackedCreatureSound?.Value ?? false;
         internal static bool IsManualPinRemovalEnabled => _isManualPinRemovalEnabled?.Value ?? true;
@@ -32,6 +30,7 @@ namespace HexRareScanner
 
         internal static Plugin Instance;
         internal static ManualLogSource Log;
+        internal static readonly FieldInfo CharacterMLevelField = AccessTools.Field(typeof(Character), "m_level");
 
         private void Awake()
         {
@@ -66,7 +65,7 @@ namespace HexRareScanner
             _isManualPinRemovalEnabled = Config.Bind("Map Pins", "Enable Manual Pin Removal", true, "Allow tracked creature pins to be removed by right-clicking them on the map.");
             _isCreatureIconsEnabled = Config.Bind("Map Pins", "Enable Creature Icons", true, "Use creature icons for tracked creature map pins. When disabled, the default Valheim blue ping icon is used. Requires a game restart.");
 
-            foreach (var creature in TrackedCreatureDefinition.Creatures)
+            foreach (TrackedCreatureDefinition creature in TrackedCreatureDefinition.Creatures)
             {
                 AddTrackedCreature(creature.ConfigSection, creature.PrefabName, creature.ConfigName, creature.DisplayName, creature.SoundEffectName, creature.MinimumLevel);
             }
@@ -81,63 +80,17 @@ namespace HexRareScanner
                 rarityLevel);
         }
 
-        internal static bool IsTrackedPrefab(string prefabName, int creatureLevel)
+        internal static TrackedCreatureSetting GetTrackedCreature(string prefabName)
         {
-            if (!IsModEnabled)
+            if (!TrackedCreatures.TryGetValue(prefabName, out TrackedCreatureSetting trackedCreature))
             {
-                return false;
+                return null;
             }
 
-            return TryGetTrackedCreature(prefabName, out TrackedCreatureSetting trackedCreature)
-                && trackedCreature.Enabled != null
-                && trackedCreature.Enabled.Value
-                && creatureLevel >= trackedCreature.RarityLevel;
+            return trackedCreature.Enabled.Value ? trackedCreature : null;
         }
 
-        internal static string GetDisplayName(string prefabName)
-        {
-            return TryGetTrackedCreature(prefabName, out TrackedCreatureSetting trackedCreature)
-                ? trackedCreature.DisplayName
-                : prefabName;
-        }
-
-        internal static string GetSoundEffectName(string prefabName)
-        {
-            return TryGetTrackedCreature(prefabName, out TrackedCreatureSetting trackedCreature)
-                ? trackedCreature.SoundEffectName
-                : null;
-        }
-
-        internal static int GetCreatureLevel(Character character)
-        {
-            if (character == null || CharacterMLevelField == null)
-            {
-                return 1;
-            }
-
-            object value = CharacterMLevelField.GetValue(character);
-
-            if (value is int level)
-            {
-                return level;
-            }
-
-            return 1;
-        }
-
-        private static bool TryGetTrackedCreature(string prefabName, out TrackedCreatureSetting trackedCreature)
-        {
-            trackedCreature = null;
-
-            if (string.IsNullOrEmpty(prefabName))
-            {
-                return false;
-            }
-
-            return TrackedCreatures.TryGetValue(prefabName, out trackedCreature) && trackedCreature != null;
-        }
-
-        private sealed class TrackedCreatureSetting
+        internal sealed class TrackedCreatureSetting
         {
             internal TrackedCreatureSetting(ConfigEntry<bool> enabled, string displayName, string soundEffectName, int rarityLevel)
             {

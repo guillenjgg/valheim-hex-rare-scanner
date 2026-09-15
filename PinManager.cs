@@ -8,7 +8,6 @@ namespace HexRareScanner
     internal static class PinManager
     {
         private static readonly Dictionary<ZDOID, Minimap.PinData> PinsByZdoid = new Dictionary<ZDOID, Minimap.PinData>();
-
         private static readonly FieldInfo CharacterNViewField = AccessTools.Field(typeof(Character), "m_nview");
         private static readonly MethodInfo RemovePinMethod = AccessTools.Method(typeof(Minimap), "RemovePin", new[] { typeof(Minimap.PinData) });
 

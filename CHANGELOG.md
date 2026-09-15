@@ -4,6 +4,15 @@
 
 ### Added
 
+* Added a map pin option to use either creature trophy icons or the vanilla Valheim ping icon. Changes require a game restart.
+
+### Fixed
+
+* Improved performance by:
+	* skipping the tracking coroutine for creatures that are not being tracked
+	* limiting the number of lookups for creature prefabs
+
+
 ## v1.3.0
 
 ### Added

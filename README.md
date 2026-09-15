@@ -4,7 +4,8 @@ Automatically adds minimap pins and plays a sound when selected rare creatures s
 
 ## Features
 
-* Automatically adds pins to the minimap when tracked creatures spawn.
+* Automatically adds minimap pins when tracked creatures spawn.
+* Optional creature icons for tracked creature map pins.
 * Optional sound notification when a tracked creature is detected.
 * Pins are automatically removed when the creature dies.
 * Tracked creature pins can be manually removed by right-clicking them on the map.
@@ -69,34 +70,12 @@ Current supported creatures include:
 * Eyeless One
 * Elaking
 
-## Writhan
-
-Writhan is an extremely rare Swamp spawn.
-
-Spawn requirements include:
-
-* Swamp biome
-* Median biome area
-* 5,000 to 8,000 meters from the world center
-* Altitude between -2 and 10 meters
-* Terrain slope between 0 and 35 degrees
-* Can spawn during the day or night
-* 5% spawn chance
-* Spawn interval of 8,000 seconds
-* Maximum nearby active Writhans: 1
-* Can spawn at levels 1 through 3
-* Cannot spawn inside a player base
-* No boss, global key, environment, or event requirement
-
 ## Configuration
 
 Configuration file:
 
 `BepInEx/config/com.hex.rarescanner.cfg`
 
-Tracked creatures can be enabled or disabled individually through the BepInEx configuration settings.
-
-Manual map pin removal and tracked creature sounds can also be enabled or disabled through configuration.
 
 ## Links
 

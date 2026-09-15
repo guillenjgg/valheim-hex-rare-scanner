@@ -9,7 +9,69 @@ namespace HexRareScanner.Patches
     {
         private static void Postfix(Character __instance)
         {
-            Plugin.Instance.StartCoroutine(DelayedScan(__instance));
+            if (!Plugin.IsModEnabled || __instance == null)
+            {
+                return;
+            }
+
+            string prefabName = PrefabNameHelper.GetPrefabNameFromClone(__instance.gameObject.name);
+
+            if(string.IsNullOrWhiteSpace(prefabName))
+            {
+                return;
+            }
+
+            Plugin.TrackedCreatureSetting trackedCreature = Plugin.GetTrackedCreature(prefabName);
+
+            if (trackedCreature == null)
+            {
+                return;
+            }
+
+            Plugin.Instance.StartCoroutine(DelayedScan(__instance, prefabName, trackedCreature));
+        }
+
+        // Delay two frames so m_level is initialized.
+        private static IEnumerator DelayedScan(Character character, string prefabName, Plugin.TrackedCreatureSetting trackedCreature)
+        {
+            yield return null;
+            yield return null;
+
+            if (!Plugin.IsModEnabled || character == null)
+            {
+                yield break;
+            }
+
+            int creatureLevel = (int)Plugin.CharacterMLevelField.GetValue(character);
+
+            if (creatureLevel < trackedCreature.RarityLevel || PinManager.HasCreaturePin(character))
+            {
+                yield break;
+            }
+
+            string displayName = trackedCreature.DisplayName;
+
+            if (creatureLevel > 1)
+            {
+                displayName = $"{creatureLevel - 1}-star {displayName}";
+            }
+
+            Vector3 spawnPoint = character.transform.position;
+
+            if (Plugin.PlayTrackedCreatureSound)
+            {
+#if DEBUG
+                if (string.IsNullOrEmpty(trackedCreature.SoundEffectName))
+                {
+                    Plugin.Log.LogDebug($"No sound effect configured for tracked creature '{displayName}' (prefab: '{prefabName}').");
+                }
+#endif
+
+                PlayTrackedCreatureSound(trackedCreature.SoundEffectName, spawnPoint);
+            }
+
+            Player.m_localPlayer?.Message(MessageHud.MessageType.Center, $"A {displayName} spawned!");
+            PinManager.AddCreaturePin(character, spawnPoint, displayName);
         }
 
         private static void PlayTrackedCreatureSound(string soundEffectName, Vector3 position)
@@ -34,56 +96,6 @@ namespace HexRareScanner.Patches
             }
 
             Object.Instantiate(sfxPrefab, position, Quaternion.identity);
-        }
-
-        // We need to delay the scan, so m_level is initialized
-        private static IEnumerator DelayedScan(Character character)
-        {
-            yield return null;
-            yield return null;
-
-            if (!Plugin.IsModEnabled || character == null)
-            {
-                yield break;
-            }
-
-            string prefabName = PrefabNameHelper.GetPrefabNameFromClone(character.gameObject.name);
-            int creatureLevel = Plugin.GetCreatureLevel(character);
-
-            if (!Plugin.IsTrackedPrefab(prefabName, creatureLevel))
-            {
-                yield break;
-            }
-
-            if (PinManager.HasCreaturePin(character))
-            {
-                yield break;
-            }
-
-            string displayName = Plugin.GetDisplayName(prefabName);
-
-            if (creatureLevel > 1)
-            {
-                displayName = $"{creatureLevel - 1}-star {displayName}";
-            }
-
-            Vector3 spawnPoint = character.transform.position;
-
-            if (Plugin.PlayTrackedCreatureSound)
-            {
-                string soundEffectName = Plugin.GetSoundEffectName(prefabName);
-
-#if DEBUG
-                if(string.IsNullOrEmpty(soundEffectName))
-                {
-                    Plugin.Log.LogDebug($"No sound effect configured for tracked creature '{displayName}' (prefab: '{prefabName}').");
-                }
-#endif
-                PlayTrackedCreatureSound(soundEffectName, spawnPoint);
-            }
-
-            Player.m_localPlayer?.Message(MessageHud.MessageType.Center, $"A {displayName} spawned!");
-            PinManager.AddCreaturePin(character, spawnPoint, displayName);
         }
     }
 }
