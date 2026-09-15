@@ -43,11 +43,14 @@ namespace HexRareScanner
 
             if (definition != null)
             {
-                Sprite creatureIcon = GetCreatureIcon(definition.TrophyPrefabName);
-
-                if (creatureIcon != null)
+                if (Plugin.IsCreatureIconsEnabled)
                 {
-                    SetPinIcon(pin, creatureIcon);
+                    Sprite creatureIcon = GetCreatureIcon(definition.TrophyPrefabName);
+
+                    if (creatureIcon != null)
+                    {
+                        SetPinIcon(pin, creatureIcon);
+                    }
                 }
             }
 
