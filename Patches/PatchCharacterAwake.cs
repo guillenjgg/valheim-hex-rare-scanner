@@ -9,81 +9,73 @@ namespace HexRareScanner.Patches
     {
         private static void Postfix(Character __instance)
         {
-            Plugin.Instance.StartCoroutine(DelayedScan(__instance));
-        }
-
-        private static void PlayTrackedCreatureSound(string soundEffectName, Vector3 position)
-        {
-            if (string.IsNullOrEmpty(soundEffectName))
+            if (!Plugin.IsModEnabled || __instance == null)
             {
                 return;
             }
 
-            if (ZNetScene.instance == null)
+            string prefabName = PrefabNameHelper.GetPrefabNameFromClone(__instance.gameObject.name);
+
+            if (string.IsNullOrWhiteSpace(prefabName))
             {
-                Plugin.Log.LogDebug("ZNetScene.instance is null. Could not play tracked creature sound.");
                 return;
             }
 
-            GameObject sfxPrefab = ZNetScene.instance.GetPrefab(soundEffectName);
+            Plugin.TrackedCreatureSetting trackedCreature = Plugin.GetTrackedCreature(prefabName);
 
-            if (sfxPrefab == null)
+            if (trackedCreature == null)
             {
-                Plugin.Log.LogDebug($"Could not find sound effect prefab: {soundEffectName}");
                 return;
             }
 
-            Object.Instantiate(sfxPrefab, position, Quaternion.identity);
-        }
+            int creatureLevel = (int)Plugin.CharacterMLevelField.GetValue(__instance);
 
-        // We need to delay the scan, so m_level is initialized
-        private static IEnumerator DelayedScan(Character character)
-        {
-            yield return null;
-            yield return null;
-
-            if (!Plugin.IsModEnabled || character == null)
+            if (creatureLevel < trackedCreature.RarityLevel || PinManager.HasCreaturePin(__instance))
             {
-                yield break;
+                return;
             }
 
-            string prefabName = PrefabNameHelper.GetPrefabNameFromClone(character.gameObject.name);
-            int creatureLevel = Plugin.GetCreatureLevel(character);
-
-            if (!Plugin.IsTrackedPrefab(prefabName, creatureLevel))
-            {
-                yield break;
-            }
-
-            if (PinManager.HasCreaturePin(character))
-            {
-                yield break;
-            }
-
-            string displayName = Plugin.GetDisplayName(prefabName);
+            string displayName = trackedCreature.DisplayName;
 
             if (creatureLevel > 1)
             {
                 displayName = $"{creatureLevel - 1}-star {displayName}";
             }
 
-            Vector3 spawnPoint = character.transform.position;
+            Vector3 spawnPoint = __instance.transform.position;
 
             if (Plugin.PlayTrackedCreatureSound)
             {
-                string soundEffectName = Plugin.GetSoundEffectName(prefabName);
-
-#if DEBUG
-                if(string.IsNullOrEmpty(soundEffectName))
-                {
-                    Plugin.Log.LogDebug($"No sound effect configured for tracked creature '{displayName}' (prefab: '{prefabName}').");
-                }
-#endif
-                PlayTrackedCreatureSound(soundEffectName, spawnPoint);
+                Plugin.Instance.StartCoroutine(PlayTrackedCreatureSound(trackedCreature.SoundEffectName, spawnPoint));
             }
 
             Player.m_localPlayer?.Message(MessageHud.MessageType.Center, $"A {displayName} spawned!");
-            PinManager.AddCreaturePin(character, spawnPoint, displayName);
+
+            PinManager.AddCreaturePin(__instance, spawnPoint, displayName);
+        }
+
+        private static IEnumerator PlayTrackedCreatureSound(string soundEffectName, Vector3 position)
+        {
+            yield return null;
+
+            if (string.IsNullOrEmpty(soundEffectName))
+            {
+                yield break;
+            }
+
+            if (ZNetScene.instance == null)
+            {
+                yield break;
+            }
+
+            GameObject sfxPrefab = ZNetScene.instance.GetPrefab(soundEffectName);
+
+            if (sfxPrefab == null)
+            {
+                yield break;
+            }
+
+            Object.Instantiate(sfxPrefab, position, Quaternion.identity);
         }
     }
 }

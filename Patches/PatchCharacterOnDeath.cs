@@ -1,24 +1,39 @@
 ﻿using HarmonyLib;
-using HexRareScanner;
 
-[HarmonyPatch(typeof(Character), nameof(Character.OnDeath))]
-internal static class PatchCharacterOnDeath
+namespace HexRareScanner.Patches
 {
-    internal static void Prefix(Character __instance)
+    [HarmonyPatch(typeof(Character), nameof(Character.OnDeath))]
+    internal static class PatchCharacterOnDeath
     {
-        if (!Plugin.IsModEnabled || __instance == null)
+        private static void Prefix(Character __instance)
         {
-            return;
+            if (!Plugin.IsModEnabled || __instance == null)
+            {
+                return;
+            }
+
+            string prefabName = PrefabNameHelper.GetPrefabNameFromClone(__instance.gameObject.name);
+
+            if (string.IsNullOrWhiteSpace(prefabName))
+            {
+                return;
+            }
+
+            Plugin.TrackedCreatureSetting trackedCreature = Plugin.GetTrackedCreature(prefabName);
+
+            if (trackedCreature == null)
+            {
+                return;
+            }
+
+            int creatureLevel = (int)Plugin.CharacterMLevelField.GetValue(__instance);
+
+            if (creatureLevel < trackedCreature.RarityLevel)
+            {
+                return;
+            }
+
+            PinManager.RemoveCreaturePin(__instance);
         }
-
-        string prefabName = PrefabNameHelper.GetPrefabNameFromClone(__instance.gameObject.name);
-        int creatureLevel = Plugin.GetCreatureLevel(__instance);
-
-        if (!Plugin.IsTrackedPrefab(prefabName, creatureLevel))
-        {
-            return;
-        }
-
-        PinManager.RemoveCreaturePin(__instance);
     }
 }

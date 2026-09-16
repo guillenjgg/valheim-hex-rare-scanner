@@ -1,5 +1,19 @@
 ## Changelog
 
+## v1.3.1
+
+### Added
+
+* Added a map pin option to use either creature trophy icons or the vanilla Valheim ping icon. Changes require a game restart.
+
+### Fixed
+
+* Improved creature tracking performance by:
+	* removing the delayed tracking coroutine
+	* skipping processing for creatures that are not being tracked
+	* reducing duplicate creature prefab lookups
+* Fixed tracked creature spawn sounds causing `Double ZNetview` warnings.
+
 ## v1.3.0
 
 ### Added
