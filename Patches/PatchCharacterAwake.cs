@@ -16,7 +16,7 @@ namespace HexRareScanner.Patches
 
             string prefabName = PrefabNameHelper.GetPrefabNameFromClone(__instance.gameObject.name);
 
-            if(string.IsNullOrWhiteSpace(prefabName))
+            if (string.IsNullOrWhiteSpace(prefabName))
             {
                 return;
             }
@@ -28,25 +28,11 @@ namespace HexRareScanner.Patches
                 return;
             }
 
-            Plugin.Instance.StartCoroutine(DelayedScan(__instance, prefabName, trackedCreature));
-        }
+            int creatureLevel = (int)Plugin.CharacterMLevelField.GetValue(__instance);
 
-        // Delay two frames so m_level is initialized.
-        private static IEnumerator DelayedScan(Character character, string prefabName, Plugin.TrackedCreatureSetting trackedCreature)
-        {
-            yield return null;
-            yield return null;
-
-            if (!Plugin.IsModEnabled || character == null)
+            if (creatureLevel < trackedCreature.RarityLevel || PinManager.HasCreaturePin(__instance))
             {
-                yield break;
-            }
-
-            int creatureLevel = (int)Plugin.CharacterMLevelField.GetValue(character);
-
-            if (creatureLevel < trackedCreature.RarityLevel || PinManager.HasCreaturePin(character))
-            {
-                yield break;
+                return;
             }
 
             string displayName = trackedCreature.DisplayName;
@@ -56,43 +42,37 @@ namespace HexRareScanner.Patches
                 displayName = $"{creatureLevel - 1}-star {displayName}";
             }
 
-            Vector3 spawnPoint = character.transform.position;
+            Vector3 spawnPoint = __instance.transform.position;
 
             if (Plugin.PlayTrackedCreatureSound)
             {
-#if DEBUG
-                if (string.IsNullOrEmpty(trackedCreature.SoundEffectName))
-                {
-                    Plugin.Log.LogDebug($"No sound effect configured for tracked creature '{displayName}' (prefab: '{prefabName}').");
-                }
-#endif
-
-                PlayTrackedCreatureSound(trackedCreature.SoundEffectName, spawnPoint);
+                Plugin.Instance.StartCoroutine(PlayTrackedCreatureSound(trackedCreature.SoundEffectName, spawnPoint));
             }
 
             Player.m_localPlayer?.Message(MessageHud.MessageType.Center, $"A {displayName} spawned!");
-            PinManager.AddCreaturePin(character, spawnPoint, displayName);
+
+            PinManager.AddCreaturePin(__instance, spawnPoint, displayName);
         }
 
-        private static void PlayTrackedCreatureSound(string soundEffectName, Vector3 position)
+        private static IEnumerator PlayTrackedCreatureSound(string soundEffectName, Vector3 position)
         {
+            yield return null;
+
             if (string.IsNullOrEmpty(soundEffectName))
             {
-                return;
+                yield break;
             }
 
             if (ZNetScene.instance == null)
             {
-                Plugin.Log.LogDebug("ZNetScene.instance is null. Could not play tracked creature sound.");
-                return;
+                yield break;
             }
 
             GameObject sfxPrefab = ZNetScene.instance.GetPrefab(soundEffectName);
 
             if (sfxPrefab == null)
             {
-                Plugin.Log.LogDebug($"Could not find sound effect prefab: {soundEffectName}");
-                return;
+                yield break;
             }
 
             Object.Instantiate(sfxPrefab, position, Quaternion.identity);

@@ -5,7 +5,7 @@ Automatically adds minimap pins and plays a sound when selected rare creatures s
 ## Features
 
 * Automatically adds minimap pins when tracked creatures spawn.
-* Optional creature icons for tracked creature map pins.
+* Optional creature trophy icons for tracked creature map pins. When disabled, the vanilla Valheim ping icon is used.
 * Optional sound notification when a tracked creature is detected.
 * Pins are automatically removed when the creature dies.
 * Tracked creature pins can be manually removed by right-clicking them on the map.
@@ -75,7 +75,6 @@ Current supported creatures include:
 Configuration file:
 
 `BepInEx/config/com.hex.rarescanner.cfg`
-
 
 ## Links
 

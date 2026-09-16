@@ -8,10 +8,11 @@
 
 ### Fixed
 
-* Improved performance by:
-	* skipping the tracking coroutine for creatures that are not being tracked
-	* limiting the number of lookups for creature prefabs
-
+* Improved creature tracking performance by:
+	* removing the delayed tracking coroutine
+	* skipping processing for creatures that are not being tracked
+	* reducing duplicate creature prefab lookups
+* Fixed tracked creature spawn sounds causing `Double ZNetview` warnings.
 
 ## v1.3.0
 
