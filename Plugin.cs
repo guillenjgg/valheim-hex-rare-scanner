@@ -52,7 +52,7 @@ namespace HexRareScanner
         {
             Log?.LogInfo($"{PluginName} v{PluginVersion} unloaded.");
 
-            IsLabelsEnabled.SettingChanged -= Config_SettingChanged;
+            IsLabelsEnabled.SettingChanged -= ConfigSettingChanged;
 
             _harmonyInstance?.UnpatchSelf();
             _harmonyInstance = null;
@@ -70,7 +70,7 @@ namespace HexRareScanner
             _isCreatureIconsEnabled = Config.Bind("Map Pins", "Enable Creature Icons", true, "Use creature icons for tracked creature map pins. When disabled, the default Valheim blue ping icon is used. Requires a game restart.");
             IsLabelsEnabled = Config.Bind("Map Pins", "Enable Labels", true, "Enables tracked creature labels.");
 
-            IsLabelsEnabled.SettingChanged += Config_SettingChanged;
+            IsLabelsEnabled.SettingChanged += ConfigSettingChanged;
 
             foreach (TrackedCreatureDefinition creature in TrackedCreatureDefinition.Creatures)
             {
@@ -78,7 +78,7 @@ namespace HexRareScanner
             }
         }
 
-        private void Config_SettingChanged(object sender, EventArgs e)
+        private void ConfigSettingChanged(object sender, EventArgs e)
         {
             PinManager.UpdateLabels();
         }
