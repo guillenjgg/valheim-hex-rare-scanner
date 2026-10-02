@@ -31,12 +31,7 @@ namespace HexRareScanner
                 return;
             }
 
-            Minimap.PinData pin = Minimap.instance.AddPin(
-                position,
-                Minimap.PinType.Ping,
-                pinName,
-                false,
-                false);
+            Minimap.PinData pin = Minimap.instance.AddPin(position, Minimap.PinType.Ping, pinName, false, false);
 
             if (pin == null)
             {
@@ -59,7 +54,10 @@ namespace HexRareScanner
                 }
             }
 
-            PinsByZdoid[zdoid] = new CreaturePin(pin, pinName);
+            CreaturePin creaturePin = new CreaturePin(pin, pinName);
+            PinsByZdoid[zdoid] = creaturePin;
+
+            UpdateLabel(creaturePin, Plugin.IsLabelsEnabled?.Value ?? true);
         }
 
         internal static void RemoveCreaturePin(Character character)
@@ -187,17 +185,26 @@ namespace HexRareScanner
 
             foreach (CreaturePin creaturePin in PinsByZdoid.Values)
             {
-                if (creaturePin.Pin == null)
-                {
-                    continue;
-                }
-
-                creaturePin.Pin.m_name = labelsEnabled
-                    ? creaturePin.Label
-                    : string.Empty;
+                UpdateLabel(creaturePin, labelsEnabled);
             }
 
             SetPinUpdateRequired();
+        }
+
+        private static void UpdateLabel(CreaturePin creaturePin, bool labelsEnabled)
+        {
+            if (creaturePin?.Pin == null)
+            {
+                return;
+            }
+
+            Minimap.PinData pin = creaturePin.Pin;
+            pin.m_name = labelsEnabled ? creaturePin.Label : string.Empty;
+
+            if (pin.m_NamePinData?.PinNameText != null)
+            {
+                pin.m_NamePinData.PinNameText.text = Localization.instance.Localize(pin.m_name);
+            }
         }
 
         private static void SetPinUpdateRequired()
