@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -12,7 +13,7 @@ namespace HexRareScanner
     {
         private const string PluginGuid = "com.hex.rarescanner";
         private const string PluginName = "HexRareScanner";
-        private const string PluginVersion = "1.3.1";
+        private const string PluginVersion = "1.4.0";
 
         private Harmony _harmonyInstance;
 
@@ -20,6 +21,7 @@ namespace HexRareScanner
         private static ConfigEntry<bool> _playTrackedCreatureSound;
         private static ConfigEntry<bool> _isManualPinRemovalEnabled;
         private static ConfigEntry<bool> _isCreatureIconsEnabled;
+        internal static ConfigEntry<bool> IsLabelsEnabled = null;
 
         private static readonly Dictionary<string, TrackedCreatureSetting> TrackedCreatures = new Dictionary<string, TrackedCreatureSetting>();
 
@@ -50,6 +52,8 @@ namespace HexRareScanner
         {
             Log?.LogInfo($"{PluginName} v{PluginVersion} unloaded.");
 
+            IsLabelsEnabled.SettingChanged -= ConfigSettingChanged;
+
             _harmonyInstance?.UnpatchSelf();
             _harmonyInstance = null;
             Instance = null;
@@ -64,11 +68,19 @@ namespace HexRareScanner
             _playTrackedCreatureSound = Config.Bind("Sounds", "PlayTrackedCreatureSound", true, "Enable or disable the tracked creature spawn sound.");
             _isManualPinRemovalEnabled = Config.Bind("Map Pins", "Enable Manual Pin Removal", true, "Allow tracked creature pins to be removed by right-clicking them on the map.");
             _isCreatureIconsEnabled = Config.Bind("Map Pins", "Enable Creature Icons", true, "Use creature icons for tracked creature map pins. When disabled, the default Valheim blue ping icon is used. Requires a game restart.");
+            IsLabelsEnabled = Config.Bind("Map Pins", "Enable Labels", true, "Enables tracked creature labels.");
+
+            IsLabelsEnabled.SettingChanged += ConfigSettingChanged;
 
             foreach (TrackedCreatureDefinition creature in TrackedCreatureDefinition.Creatures)
             {
                 AddTrackedCreature(creature.ConfigSection, creature.PrefabName, creature.ConfigName, creature.DisplayName, creature.SoundEffectName, creature.MinimumLevel);
             }
+        }
+
+        private void ConfigSettingChanged(object sender, EventArgs e)
+        {
+            PinManager.UpdateLabels();
         }
 
         private void AddTrackedCreature(string configSection, string prefabName, string configName, string displayName, string soundEffectName, int rarityLevel = 1)

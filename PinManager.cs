@@ -7,9 +7,10 @@ namespace HexRareScanner
 {
     internal static class PinManager
     {
-        private static readonly Dictionary<ZDOID, Minimap.PinData> PinsByZdoid = new Dictionary<ZDOID, Minimap.PinData>();
+        private static readonly Dictionary<ZDOID, CreaturePin> PinsByZdoid = new Dictionary<ZDOID, CreaturePin>();
         private static readonly FieldInfo CharacterNViewField = AccessTools.Field(typeof(Character), "m_nview");
         private static readonly MethodInfo RemovePinMethod = AccessTools.Method(typeof(Minimap), "RemovePin", new[] { typeof(Minimap.PinData) });
+        private static readonly FieldInfo MPinUpdateRequired = AccessTools.Field(typeof(Minimap), "m_pinUpdateRequired");
 
         internal static void AddCreaturePin(Character character, Vector3 position, string pinName)
         {
@@ -53,7 +54,10 @@ namespace HexRareScanner
                 }
             }
 
-            PinsByZdoid[zdoid] = pin;
+            CreaturePin creaturePin = new CreaturePin(pin, pinName);
+            PinsByZdoid[zdoid] = creaturePin;
+
+            UpdateLabel(creaturePin, Plugin.IsLabelsEnabled?.Value ?? true);
         }
 
         internal static void RemoveCreaturePin(Character character)
@@ -70,12 +74,12 @@ namespace HexRareScanner
                 return;
             }
 
-            if (!PinsByZdoid.TryGetValue(zdoid, out Minimap.PinData pin))
+            if (!PinsByZdoid.TryGetValue(zdoid, out CreaturePin creaturePin))
             {
                 return;
             }
 
-            RemovePinMethod?.Invoke(Minimap.instance, new object[] { pin });
+            RemovePinMethod?.Invoke(Minimap.instance, new object[] { creaturePin.Pin });
             PinsByZdoid.Remove(zdoid);
         }
 
@@ -84,8 +88,10 @@ namespace HexRareScanner
             Minimap.PinData closestPin = null;
             float closestDistance = float.MaxValue;
 
-            foreach (Minimap.PinData pin in PinsByZdoid.Values)
+            foreach (CreaturePin creaturePin in PinsByZdoid.Values)
             {
+                Minimap.PinData pin = creaturePin.Pin;
+
                 if (pin == null)
                 {
                     continue;
@@ -119,9 +125,9 @@ namespace HexRareScanner
 
             ZDOID zdoidToRemove = ZDOID.None;
 
-            foreach (KeyValuePair<ZDOID, Minimap.PinData> entry in PinsByZdoid)
+            foreach (KeyValuePair<ZDOID, CreaturePin> entry in PinsByZdoid)
             {
-                if (entry.Value == pin)
+                if (entry.Value.Pin == pin)
                 {
                     zdoidToRemove = entry.Key;
                     break;
@@ -171,6 +177,44 @@ namespace HexRareScanner
         internal static void Clear()
         {
             PinsByZdoid.Clear();
+        }
+
+        internal static void UpdateLabels()
+        {
+            bool labelsEnabled = Plugin.IsLabelsEnabled?.Value ?? true;
+
+            foreach (CreaturePin creaturePin in PinsByZdoid.Values)
+            {
+                UpdateLabel(creaturePin, labelsEnabled);
+            }
+
+            SetPinUpdateRequired();
+        }
+
+        private static void UpdateLabel(CreaturePin creaturePin, bool labelsEnabled)
+        {
+            if (creaturePin?.Pin == null)
+            {
+                return;
+            }
+
+            Minimap.PinData pin = creaturePin.Pin;
+            pin.m_name = labelsEnabled ? creaturePin.Label : string.Empty;
+
+            if (pin.m_NamePinData?.PinNameText != null)
+            {
+                pin.m_NamePinData.PinNameText.text = Localization.instance.Localize(pin.m_name);
+            }
+        }
+
+        private static void SetPinUpdateRequired()
+        {
+            if (Minimap.instance == null)
+            {
+                return;
+            }
+
+            MPinUpdateRequired.SetValue(Minimap.instance, true);
         }
 
         private static TrackedCreatureDefinition GetCreatureDefinition(string prefabName)
@@ -223,6 +267,18 @@ namespace HexRareScanner
             {
                 pin.m_iconElement.sprite = icon;
             }
+        }
+
+        private sealed class CreaturePin
+        {
+            internal CreaturePin(Minimap.PinData pin, string label)
+            {
+                Pin = pin;
+                Label = label;
+            }
+
+            internal Minimap.PinData Pin { get; }
+            internal string Label { get; }
         }
     }
 }

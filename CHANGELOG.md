@@ -1,5 +1,12 @@
 ## Changelog
 
+## v1.4.0
+
+### Added
+- Fenring are not tracked
+- New Hide Label feature
+- Compiled against Valheim v1.0.16
+
 ## v1.3.1
 
 ### Added

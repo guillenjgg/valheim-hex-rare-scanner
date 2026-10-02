@@ -34,6 +34,7 @@ namespace HexRareScanner
 
             new TrackedCreatureDefinition(Biomes.Mountains, "StoneGolem", "Track Stone Golems", "Stone Golem", "sfx_stonegolem_idle", "TrophySGolem"),
             new TrackedCreatureDefinition(Biomes.Mountains, "Wolf", "Track 2-star Wolves", "Wolf", "sfx_wolf_alerted", "TrophyWolf", 3),
+            new TrackedCreatureDefinition(Biomes.Mountains, "Fenring", "Track Fenring", "Fenring", "sfx_fenring_howl", "TrophyFenring"),
 
             new TrackedCreatureDefinition(Biomes.Plains, "Unbjorn", "Track Vile Bears", "Vile Bear", "sfx_bear_bite_attack", "TrophyBjorn"),
 
