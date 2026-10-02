@@ -10,65 +10,7 @@ Automatically adds minimap pins and plays a sound when selected rare creatures s
 * Pins are automatically removed when the creature dies.
 * Tracked creature pins can be manually removed by right-clicking them on the map.
 * Independently configure which creatures are tracked.
-* Tracked creature settings are organized by biome.
-
-## Tracked Creatures
-
-Current supported creatures include:
-
-### Ocean
-
-* Sea Serpent
-* Bonemaw Serpent
-
-### Meadows
-
-* 2-star Deer
-* White Deer
-* 2-star Boar
-
-### Black Forest
-
-* Troll
-* Black Forest Bear
-
-### Swamp
-
-* Abomination
-* Writhan
-
-### Mountains
-
-* Stone Golem
-* 2-star Wolf
-
-### Plains
-
-* Vile Bear
-
-### Mistlands
-
-* Seeker Soldier
-* 1-star or higher Seeker
-* Gjall
-
-### Ashlands
-
-* 2-star Asksvin
-* Fallen Valkyrie
-* Morgen
-
-### Deep North
-
-* Barka
-* Shadow Person
-* Deep North Skeleton
-* 2-star Frozen Greydwarf
-* Gammeltroll
-* Moose
-* Fallen Warrior
-* Eyeless One
-* Elaking
+* Optionally display tracked creature labels
 
 ## Configuration
 
