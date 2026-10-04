@@ -57,7 +57,7 @@ namespace HexRareScanner
             CreaturePin creaturePin = new CreaturePin(pin, pinName);
             PinsByZdoid[zdoid] = creaturePin;
 
-            UpdateLabel(creaturePin, Plugin.IsLabelsEnabled?.Value ?? true);
+            UpdateLabel(creaturePin, Plugin.IsLabelsEnabled);
         }
 
         internal static void RemoveCreaturePin(Character character)
@@ -181,11 +181,9 @@ namespace HexRareScanner
 
         internal static void UpdateLabels()
         {
-            bool labelsEnabled = Plugin.IsLabelsEnabled?.Value ?? true;
-
             foreach (CreaturePin creaturePin in PinsByZdoid.Values)
             {
-                UpdateLabel(creaturePin, labelsEnabled);
+                UpdateLabel(creaturePin, Plugin.IsLabelsEnabled);
             }
 
             SetPinUpdateRequired();

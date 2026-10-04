@@ -1,9 +1,15 @@
 ## Changelog
 
+## v1.4.1
+
+### Added
+- Seals are now tracked creatures
+- Add configuration option to show/hide the creature spawned message
+
 ## v1.4.0
 
 ### Added
-- Fenring are not tracked
+- Fenring are now tracked creatures
 - New Hide Label feature
 - Compiled against Valheim v1.0.16
 
