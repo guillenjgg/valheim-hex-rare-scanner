@@ -49,7 +49,10 @@ namespace HexRareScanner.Patches
                 Plugin.Instance.StartCoroutine(PlayTrackedCreatureSound(trackedCreature.SoundEffectName, spawnPoint));
             }
 
-            Player.m_localPlayer?.Message(MessageHud.MessageType.Center, $"A {displayName} spawned!");
+            if (Plugin.IsCreatureSpawnAlertEnabled)
+            {
+                Player.m_localPlayer?.Message(MessageHud.MessageType.Center, $"A {displayName} spawned!");
+            }
 
             PinManager.AddCreaturePin(__instance, spawnPoint, displayName);
         }

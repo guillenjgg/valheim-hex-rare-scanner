@@ -13,7 +13,7 @@ namespace HexRareScanner
     {
         private const string PluginGuid = "com.hex.rarescanner";
         private const string PluginName = "HexRareScanner";
-        private const string PluginVersion = "1.4.0";
+        private const string PluginVersion = "1.4.1";
 
         private Harmony _harmonyInstance;
 
@@ -21,7 +21,8 @@ namespace HexRareScanner
         private static ConfigEntry<bool> _playTrackedCreatureSound;
         private static ConfigEntry<bool> _isManualPinRemovalEnabled;
         private static ConfigEntry<bool> _isCreatureIconsEnabled;
-        internal static ConfigEntry<bool> IsLabelsEnabled = null;
+        private static ConfigEntry<bool> _isLabelsEnabled;
+        private static ConfigEntry<bool> _isCreatureSpawnAlertEnabled;
 
         private static readonly Dictionary<string, TrackedCreatureSetting> TrackedCreatures = new Dictionary<string, TrackedCreatureSetting>();
 
@@ -29,6 +30,8 @@ namespace HexRareScanner
         internal static bool PlayTrackedCreatureSound => _playTrackedCreatureSound?.Value ?? false;
         internal static bool IsManualPinRemovalEnabled => _isManualPinRemovalEnabled?.Value ?? true;
         internal static bool IsCreatureIconsEnabled => _isCreatureIconsEnabled?.Value ?? true;
+        internal static bool IsLabelsEnabled => _isLabelsEnabled?.Value ?? true;
+        internal static bool IsCreatureSpawnAlertEnabled => _isCreatureSpawnAlertEnabled?.Value ?? true;
 
         internal static Plugin Instance;
         internal static ManualLogSource Log;
@@ -52,7 +55,7 @@ namespace HexRareScanner
         {
             Log?.LogInfo($"{PluginName} v{PluginVersion} unloaded.");
 
-            IsLabelsEnabled.SettingChanged -= ConfigSettingChanged;
+            _isLabelsEnabled.SettingChanged -= ConfigSettingChanged;
 
             _harmonyInstance?.UnpatchSelf();
             _harmonyInstance = null;
@@ -68,9 +71,10 @@ namespace HexRareScanner
             _playTrackedCreatureSound = Config.Bind("Sounds", "PlayTrackedCreatureSound", true, "Enable or disable the tracked creature spawn sound.");
             _isManualPinRemovalEnabled = Config.Bind("Map Pins", "Enable Manual Pin Removal", true, "Allow tracked creature pins to be removed by right-clicking them on the map.");
             _isCreatureIconsEnabled = Config.Bind("Map Pins", "Enable Creature Icons", true, "Use creature icons for tracked creature map pins. When disabled, the default Valheim blue ping icon is used. Requires a game restart.");
-            IsLabelsEnabled = Config.Bind("Map Pins", "Enable Labels", true, "Enables tracked creature labels.");
+            _isLabelsEnabled = Config.Bind("Map Pins", "Enable Labels", true, "Enables tracked creature labels.");
+            _isCreatureSpawnAlertEnabled = Config.Bind("Map Pins", "Enable Creature Spawn Alert", true, "Enables the yellow message in the middle of the screen that triggers, when a creature spawns.");
 
-            IsLabelsEnabled.SettingChanged += ConfigSettingChanged;
+            _isLabelsEnabled.SettingChanged += ConfigSettingChanged;
 
             foreach (TrackedCreatureDefinition creature in TrackedCreatureDefinition.Creatures)
             {
