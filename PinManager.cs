@@ -15,7 +15,7 @@ namespace HexRareScanner
         private static readonly Color UIPinBorderColor = new Color(1f, 0.75f, 0.15f, 1f);
 
         private const string WraithUIBorder = "hex_rare_scanner_wrait_border";
-        private const float BorderPadding = -16f;
+        private const float BorderPaddingMultiplier = 0.85f;
 
         internal static void AddCreaturePin(Character character, Vector3 position, string pinName)
         {
@@ -205,7 +205,7 @@ namespace HexRareScanner
                     continue;
                 }
 
-                if (creaturePin.PrefabName != "Wraith" || creaturePin.PrefabName != "Abomination")
+                if (creaturePin.PrefabName != "Wraith" && creaturePin.PrefabName != "Abomination")
                 {
                     continue;
                 }
@@ -332,7 +332,7 @@ namespace HexRareScanner
             borderRect.pivot = new Vector2(0.5f, 0.5f);
             borderRect.anchoredPosition = Vector2.zero;
 
-            float borderSize = iconSize + BorderPadding;
+            float borderSize = iconSize * BorderPaddingMultiplier;
             borderRect.sizeDelta = new Vector2(borderSize, borderSize);
 
             AddBorderEdge(borderRect, "Top", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -2f), new Vector2(0f, 2f));

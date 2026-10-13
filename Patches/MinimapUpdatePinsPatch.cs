@@ -2,7 +2,7 @@
 
 namespace HexRareScanner.Patches
 {
-    [HarmonyPatch(typeof(Minimap), "UpdatePins")]
+    [HarmonyPatch(typeof(Minimap), nameof(Minimap.UpdatePins))]
     internal static class MinimapUpdatePinsPatch
     {
         [HarmonyPostfix]
