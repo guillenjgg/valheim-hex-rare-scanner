@@ -196,6 +196,11 @@ namespace HexRareScanner
 
         internal static void UpdateCreaturePinVisuals()
         {
+            if (!Plugin.IsCreatureIconsEnabled)
+            {
+                return;
+            }
+
             foreach (var creaturePin in PinsByZdoid.Values)
             {
                 var pin = creaturePin.Pin;

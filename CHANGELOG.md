@@ -3,7 +3,9 @@
 ## v1.4.2
 
 ### Added
--
+- Wraiths are now tracked creatures
+- Yellow border to Wraith and Abomination map pins for better visual clarity
+- Compiled against Valheim v1.0.17
 
 ## v1.4.1
 
