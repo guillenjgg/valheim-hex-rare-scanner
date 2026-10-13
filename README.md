@@ -34,6 +34,7 @@ Automatically adds minimap pins and plays a sound when selected rare creatures s
 ### Swamp
 - Abomination
 - Writhan
+- Wraiths
 
 ### Mountains
 - Stone Golem

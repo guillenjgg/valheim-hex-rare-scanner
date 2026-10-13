@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace HexRareScanner
 {
@@ -11,6 +12,10 @@ namespace HexRareScanner
         private static readonly FieldInfo CharacterNViewField = AccessTools.Field(typeof(Character), "m_nview");
         private static readonly MethodInfo RemovePinMethod = AccessTools.Method(typeof(Minimap), "RemovePin", new[] { typeof(Minimap.PinData) });
         private static readonly FieldInfo MPinUpdateRequired = AccessTools.Field(typeof(Minimap), "m_pinUpdateRequired");
+        private static readonly Color UIPinBorderColor = new Color(1f, 0.75f, 0.15f, 1f);
+
+        private const string WraithUIBorder = "hex_rare_scanner_wrait_border";
+        private const float BorderPaddingMultiplier = 0.85f;
 
         internal static void AddCreaturePin(Character character, Vector3 position, string pinName)
         {
@@ -54,7 +59,7 @@ namespace HexRareScanner
                 }
             }
 
-            CreaturePin creaturePin = new CreaturePin(pin, pinName);
+            CreaturePin creaturePin = new CreaturePin(pin, pinName, prefabName);
             PinsByZdoid[zdoid] = creaturePin;
 
             UpdateLabel(creaturePin, Plugin.IsLabelsEnabled);
@@ -189,6 +194,38 @@ namespace HexRareScanner
             SetPinUpdateRequired();
         }
 
+        internal static void UpdateCreaturePinVisuals()
+        {
+            if (!Plugin.IsCreatureIconsEnabled)
+            {
+                return;
+            }
+
+            foreach (var creaturePin in PinsByZdoid.Values)
+            {
+                var pin = creaturePin.Pin;
+
+                if (pin == null || pin.m_uiElement == null)
+                {
+                    continue;
+                }
+
+                if (creaturePin.PrefabName != "Wraith" && creaturePin.PrefabName != "Abomination")
+                {
+                    continue;
+                }
+
+                if (pin.m_uiElement.Find(WraithUIBorder) != null)
+                {
+                    continue;
+                }
+
+                var iconSize = pin.m_uiElement.rect.width;
+
+                AddIconBorder(pin.m_uiElement, iconSize);
+            }
+        }
+
         private static void UpdateLabel(CreaturePin creaturePin, bool labelsEnabled)
         {
             if (creaturePin?.Pin == null)
@@ -269,14 +306,61 @@ namespace HexRareScanner
 
         private sealed class CreaturePin
         {
-            internal CreaturePin(Minimap.PinData pin, string label)
+            internal CreaturePin(Minimap.PinData pin, string label, string prefabName = null)
             {
                 Pin = pin;
                 Label = label;
+                PrefabName = prefabName;
             }
 
             internal Minimap.PinData Pin { get; }
             internal string Label { get; }
+            internal string PrefabName { get; }
+        }
+
+        private static void AddIconBorder(RectTransform pinUiElement, float iconSize)
+        {
+            Transform existingBorder = pinUiElement.Find(WraithUIBorder);
+
+            if (existingBorder != null)
+            {
+                return;
+            }
+
+            var borderObject = new GameObject(WraithUIBorder);
+            borderObject.transform.SetParent(pinUiElement, false);
+            borderObject.transform.SetAsFirstSibling();
+
+            var borderRect = borderObject.AddComponent<RectTransform>();
+            borderRect.anchorMin = new Vector2(0.5f, 0.5f);
+            borderRect.anchorMax = new Vector2(0.5f, 0.5f);
+            borderRect.pivot = new Vector2(0.5f, 0.5f);
+            borderRect.anchoredPosition = Vector2.zero;
+
+            float borderSize = iconSize * BorderPaddingMultiplier;
+            borderRect.sizeDelta = new Vector2(borderSize, borderSize);
+
+            AddBorderEdge(borderRect, "Top", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, -2f), new Vector2(0f, 2f));
+            AddBorderEdge(borderRect, "Bottom", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0f, 0f), new Vector2(0f, 2f));
+            AddBorderEdge(borderRect, "Left", new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0f), new Vector2(2f, 0f));
+            AddBorderEdge(borderRect, "Right", new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(-2f, 0f), new Vector2(2f, 0f));
+        }
+
+        private static void AddBorderEdge(RectTransform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Vector2 anchoredPosition, Vector2 sizeDelta)
+        {
+            var edgeObject = new GameObject(name);
+            edgeObject.transform.SetParent(parent, false);
+
+            var edgeRect = edgeObject.AddComponent<RectTransform>();
+            edgeRect.anchorMin = anchorMin;
+            edgeRect.anchorMax = anchorMax;
+            edgeRect.pivot = new Vector2(0.5f, 0.5f);
+            edgeRect.anchoredPosition = anchoredPosition;
+            edgeRect.sizeDelta = sizeDelta;
+
+            var edgeImage = edgeObject.AddComponent<Image>();
+            edgeImage.color = UIPinBorderColor;
+            edgeImage.raycastTarget = false;
         }
     }
 }
