@@ -31,6 +31,7 @@ namespace HexRareScanner
 
             new TrackedCreatureDefinition(Biomes.Swamp, "Abomination", "Track Abominations", "Abomination", "sfx_abomination_arise_end", "TrophyAbomination"),
             new TrackedCreatureDefinition(Biomes.Swamp, "Writhan", "Track Writhan", "Writhan", "sfx_writhan_verse_attack", "TrophyWrithan"),
+            new TrackedCreatureDefinition(Biomes.Swamp, "Wraith", "Track Wraiths", "Wraith", "sfx_wraith_hit", "TrophyWraith"),
 
             new TrackedCreatureDefinition(Biomes.Mountains, "StoneGolem", "Track Stone Golems", "Stone Golem", "sfx_stonegolem_idle", "TrophySGolem"),
             new TrackedCreatureDefinition(Biomes.Mountains, "Wolf", "Track 2-star Wolves", "Wolf", "sfx_wolf_alerted", "TrophyWolf", 3),
