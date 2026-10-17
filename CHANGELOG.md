@@ -1,5 +1,10 @@
 ## Changelog
 
+## v1.4.3
+
+### Changed
+- Compiled against Valheim v1.0.20
+
 ## v1.4.2
 
 ### Added
