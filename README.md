@@ -65,6 +65,7 @@ Automatically adds minimap pins and plays a sound when selected rare creatures s
 - Eyeless One
 - Elaking
 - Seal
+- Hexen
 
 ## Installation
 - Extract the contents of the zip file into your BepInEx plugins folder: `BepInEx/plugins/`
