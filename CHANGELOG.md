@@ -1,5 +1,11 @@
 ## Changelog
 
+## v1.4.5
+
+### Fixed
+- Hexen tracking now uses their trophy prefab
+- Hexen tracking plays their idle sound on spawn
+
 ## v1.4.4
 
 ### Added
