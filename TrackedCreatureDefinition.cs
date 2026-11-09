@@ -57,7 +57,7 @@ namespace HexRareScanner
             new TrackedCreatureDefinition(Biomes.DeepNorth, "ElakingMole", "Track Eyeless One", "Eyeless One", "ElakingMole_AttackClaw", "TrophyElaking"),
             new TrackedCreatureDefinition(Biomes.DeepNorth, "Elaking", "Track Elaking", "Elaking", "ElakingMole_AttackClaw", "TrophyElaking"),
             new TrackedCreatureDefinition(Biomes.DeepNorth, "Seal", "Track Seals", "Seal", "sfx_seal_crawl", "TrophySeal"),
-            new TrackedCreatureDefinition(Biomes.DeepNorth, "JotunWitch", "Track Jotun Witches", "Jotun Witch", null)
+            new TrackedCreatureDefinition(Biomes.DeepNorth, "JotunWitch", "Track Hexen", "Hexen", "sfx_jotunwitch_Idle", "TrophyJotunWitch")
         };
 
         internal string ConfigSection { get; }
